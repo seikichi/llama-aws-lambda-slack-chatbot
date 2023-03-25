@@ -1,14 +1,33 @@
-# Welcome to your CDK TypeScript project
+# LLaMA AWS Lambda Slack Chatbot
 
-This is a blank project for CDK development with TypeScript.
+![screenshot](/images/llama.png?raw=true)
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+## Deploy
 
-## Useful commands
+1. Create new Slack app
+2. Create .env file from .env.sample
+3. Create llama.cpp model and save as chatbot/model.bin
+4. Run `cdk deploy`
+5. Update App Manifest using Function URL
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `cdk deploy`      deploy this stack to your default AWS account/region
-* `cdk diff`        compare deployed stack with current state
-* `cdk synth`       emits the synthesized CloudFormation template
+```yaml
+display_information:
+  name: LLaMA
+features:
+  bot_user:
+    display_name: LLaMA
+    always_online: true
+oauth_config:
+  scopes:
+    bot:
+      - app_mentions:read
+      - chat:write
+settings:
+  event_subscriptions:
+    request_url: https://FIXME.lambda-url.FIXME.on.aws/slack/events
+    bot_events:
+      - app_mention
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false
+```
