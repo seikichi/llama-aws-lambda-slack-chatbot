@@ -1,4 +1,4 @@
 __pycache__
 
-assets/*.bin
-assets/*.txt
+model.bin
+prompt.txt

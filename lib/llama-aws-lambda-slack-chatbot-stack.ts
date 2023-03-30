@@ -7,6 +7,7 @@ import * as path from "path";
 interface ChatbotStackProps extends cdk.StackProps {
   SLACK_SIGNING_SECRET: string;
   SLACK_BOT_TOKEN: string;
+  STOP_SEQUENCE: string;
 }
 
 export class LlamaAwsLambdaSlackChatbotStack extends cdk.Stack {
@@ -21,22 +22,26 @@ export class LlamaAwsLambdaSlackChatbotStack extends cdk.Stack {
       environment: {
         SLACK_SIGNING_SECRET: props.SLACK_SIGNING_SECRET,
         SLACK_BOT_TOKEN: props.SLACK_BOT_TOKEN,
+        STOP_SEQUENCE: props.STOP_SEQUENCE,
       },
-      memorySize: 8192,
+      memorySize: 10240,
     });
+
+    // To use lazy listener features of Bolt, we need to add the following permission to the Lambda function.
+    // see: https://github.com/slackapi/bolt-python/blob/main/slack_bolt/adapter/aws_lambda/lazy_listener_runner.py#L25
+    chatbot.addToRolePolicy(
+      new iam.PolicyStatement({
+        resources: ["*"],
+        actions: ["lambda:InvokeFunction"],
+      })
+    );
 
     const functionUrl = chatbot.addFunctionUrl({
       authType: lambda.FunctionUrlAuthType.NONE,
     });
 
-    // https://github.com/slackapi/bolt-python/blob/main/slack_bolt/adapter/aws_lambda/lazy_listener_runner.py#L25
-    const policy = new iam.PolicyStatement({
-      resources: ["*"],
-      actions: ["lambda:InvokeFunction"],
-    });
-
-    chatbot.addToRolePolicy(policy);
-
+    // After this deploymenet,
+    // update settings.event_subscriptions.request_url in App Manifest of your Slack app.
     new cdk.CfnOutput(this, "SlackEventSubscriptionUrl", {
       value: `${functionUrl.url}slack/events`,
       description: "settings.event_subscriptions.request_url",

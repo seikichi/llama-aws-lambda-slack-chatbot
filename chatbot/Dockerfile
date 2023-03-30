@@ -1,7 +1,7 @@
 FROM public.ecr.aws/lambda/python:3.10
 
 # Copy ggml model to Image
-COPY assets/model.bin ${LAMBDA_TASK_ROOT}
+COPY model.bin ${LAMBDA_TASK_ROOT}
 
 # https://python-poetry.org/docs/#installation
 RUN curl -sSL https://install.python-poetry.org | python3 - && \
@@ -19,6 +19,6 @@ RUN mkdir llama.cpp && \
     git checkout FETCH_HEAD && \
     make
 
-COPY assets/prompt.txt app.py chat.py ${LAMBDA_TASK_ROOT}
+COPY prompt.txt app.py ${LAMBDA_TASK_ROOT}
 
 CMD ["app.handler"]
