@@ -1,2 +1,4 @@
-model.bin
 __pycache__
+
+assets/*.bin
+assets/*.txt

@@ -3,12 +3,14 @@ import { Construct } from "constructs";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as path from "path";
-import * as dotenv from "dotenv";
 
-dotenv.config();
+interface ChatbotStackProps extends cdk.StackProps {
+  SLACK_SIGNING_SECRET: string;
+  SLACK_BOT_TOKEN: string;
+}
 
 export class LlamaAwsLambdaSlackChatbotStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props: ChatbotStackProps) {
     super(scope, id, props);
 
     const chatbot = new lambda.DockerImageFunction(this, "ChatBotFunction", {
@@ -17,18 +19,14 @@ export class LlamaAwsLambdaSlackChatbotStack extends cdk.Stack {
         path.join(__dirname, "..", "chatbot")
       ),
       environment: {
-        SLACK_SIGNING_SECRET: process.env.SLACK_SIGNING_SECRET!,
-        SLACK_BOT_TOKEN: process.env.SLACK_BOT_TOKEN!,
+        SLACK_SIGNING_SECRET: props.SLACK_SIGNING_SECRET,
+        SLACK_BOT_TOKEN: props.SLACK_BOT_TOKEN,
       },
       memorySize: 8192,
     });
 
-    chatbot.addFunctionUrl({
+    const functionUrl = chatbot.addFunctionUrl({
       authType: lambda.FunctionUrlAuthType.NONE,
-      // cors: {
-      //   allowedMethods: [lambda.HttpMethod.POST],
-      //   allowedOrigins: ["TODO"],
-      // },
     });
 
     // https://github.com/slackapi/bolt-python/blob/main/slack_bolt/adapter/aws_lambda/lazy_listener_runner.py#L25
@@ -38,5 +36,10 @@ export class LlamaAwsLambdaSlackChatbotStack extends cdk.Stack {
     });
 
     chatbot.addToRolePolicy(policy);
+
+    new cdk.CfnOutput(this, "SlackEventSubscriptionUrl", {
+      value: `${functionUrl.url}slack/events`,
+      description: "settings.event_subscriptions.request_url",
+    });
   }
 }

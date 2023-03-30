@@ -3,25 +3,19 @@ import subprocess
 
 LLAMA_CPP_MAIN_PATH = os.environ.get("LLAMA_CPP_MAIN_PATH", "./llama.cpp/main")
 
+with open('prompt.txt', encoding='utf-8') as f:
+    PROMPT = f.read()
 
-prompt_template = """\
-The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.
-
-Human: Hello, who are you?
-AI: I am an AI. How can I help you today?
-Human: {{question}}
-AI:"""
-
+# FIXME
+STOP_SEQUENCE = "Human:"
 
 def chat(question: str) -> str:
-    prompt = prompt_template.replace('{{question}}', question)
+    prompt = PROMPT.replace('{{question}}', question)
 
     p = subprocess.run([
         LLAMA_CPP_MAIN_PATH,
         "-m",
         "./model.bin",
-        "-n",
-        "128",
         "-p",
         prompt
     ], capture_output=True, encoding="utf-8")
@@ -29,10 +23,7 @@ def chat(question: str) -> str:
     print(p.stdout)  # debug
     print(p.stderr)  # debug
 
-    stdout = p.stdout
-    index = stdout.find(prompt)
-    output = stdout[index + len(prompt):]
-    human_index = output.find("Human:")
-    ai_message = output[0:human_index if human_index >= 0 else len(output)]
-
-    return ai_message.strip()
+    index = p.stdout.find(prompt)
+    output = p.stdout[index + len(prompt):]
+    stop_index = output.find(STOP_SEQUENCE)
+    return output[0:stop_index if stop_index >= 0 else len(output)].strip()

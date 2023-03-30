@@ -1,0 +1,6 @@
+The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.
+
+Human: Hello, who are you?
+AI: I am an AI. How can I help you today?
+Human: {{question}}
+AI:

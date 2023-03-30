@@ -12,3 +12,8 @@ cdk.out
 
 # dotenv
 .env
+.env.*
+!.env.sample
+
+# ggml model
+*.bin
