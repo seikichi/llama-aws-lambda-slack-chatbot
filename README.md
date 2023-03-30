@@ -60,8 +60,8 @@ Create .env file using the above information
 > # edit .env
 > cat .env
 STACK_NAME=LLamaBotStack
-SLACK_SIGNING_SECRET=YOUR-SLACK-SIGNING-SECRET
-SLACK_BOT_TOKEN=YOUR-BOT=User-OAuth-Token
+SLACK_SIGNING_SECRET=YOUR-Signing-Secret
+SLACK_BOT_TOKEN=YOUR-Bot-User-OAuth-Token
 STOP_SEQUENCE=""
 ```
 
