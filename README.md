@@ -4,7 +4,7 @@ Create a Slack chatbot that can talk to [llama.cpp](https://github.com/ggerganov
 
 ## Demo
 
-T.B.D.
+https://user-images.githubusercontent.com/133952/228912722-941393ac-188b-44be-82f7-de1e2eecb045.mp4
 
 ## Requirements
 
