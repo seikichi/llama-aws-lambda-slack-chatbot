@@ -15,7 +15,7 @@ RUN mkdir llama.cpp && \
     cd llama.cpp && \
     git init && \
     git remote add origin https://github.com/ggerganov/llama.cpp && \
-    git fetch --depth 1 origin 9cbc404ba6699a9ba4925ea25a60552b13491c7a && \
+    git fetch --depth 1 origin f76cb3a34d6a6b03afb96650e39495f201eac042 && \
     git checkout FETCH_HEAD && \
     make
 

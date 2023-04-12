@@ -26,10 +26,23 @@ app = App(
 def answer(question: str) -> str:
     prompt = PROMPT.replace("{{question}}", question)
 
+    # with -r STOP_SEQUENCE option, llama.cpp begins to wait stdin when STOP_SEQUENCE is generated.
+    # Then the process exists because /dev/null is passed to stdin.
     p = subprocess.run(
-        [LLAMA_CPP_MAIN_PATH, "-m", "./model.bin", "-p", prompt],
+        [
+            LLAMA_CPP_MAIN_PATH,
+            "-m",
+            "./model.bin",
+            "-t",
+            "5",
+            "-p",
+            prompt,
+            "-r",
+            STOP_SEQUENCE,
+        ],
         capture_output=True,
         encoding="utf-8",
+        stdin=subprocess.DEVNULL,
     )
 
     print(p.stdout)  # debug
@@ -60,6 +73,7 @@ def handle_app_mention(request: BoltRequest, say: Say) -> None:
     message = re.sub(r"<[^>]+>\s*", "", request.body["event"]["text"])
 
     say(answer(message), thread_ts=request.body["event"]["ts"], reply_broadcast=True)
+
 
 # handle_app_mention takes a while because it executes llama.cpp ...
 # to execute such method, we need to use lazey listener feature of Bolt.
